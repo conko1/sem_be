@@ -1,5 +1,10 @@
+from dj_rest_auth.app_settings import api_settings
+from dj_rest_auth.registration.views import RegisterView
+from dj_rest_auth.utils import jwt_encode
 from django.http import Http404
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,6 +13,9 @@ from user.serializers import UserSerializer
 
 
 class UserList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -50,3 +58,41 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IsAnonymousOrAutoLoginFalse(BasePermission):
+    message = "Authenticated users cannot auto login."
+
+    def has_permission(self, request, view):
+        auto_login = request.data.get("auto_login", True)
+        return not auto_login or request.user.is_anonymous
+
+
+class JWTRegisterView(RegisterView):
+    permission_classes = [IsAnonymousOrAutoLoginFalse]
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED and self.auto_login:
+            self.set_token_cookies(response)
+        return response
+
+    def set_token_cookies(self, response):
+        if self.access_token and self.refresh_token:
+            response.set_cookie(
+                api_settings.JWT_AUTH_COOKIE, self.access_token, httponly=True
+            )
+            response.set_cookie(
+                api_settings.JWT_AUTH_REFRESH_COOKIE, self.refresh_token, httponly=True
+            )
+
+    @property
+    def auto_login(self):
+        return self.request.data.get("auto_login", True)
+
+    def perform_create(self, serializer):
+        user = serializer.save(self.request)
+        self.access_token, self.refresh_token = (
+            jwt_encode(user) if self.auto_login else (None, None)
+        )
+        return user
