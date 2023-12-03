@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'dj_rest_auth',
     'django.contrib.sites',
+    'corsheaders',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,6 +112,16 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "SIGNING_KEY": settings.SECRET_KEY,
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:9999",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -158,7 +170,9 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
     "USER_DETAILS_SERIALIZER": "user.serializers.UserSerializer",
     'REGISTER_SERIALIZER': 'user.serializers.UserRegisterSerializer',
-    'JWT_AUTH_HTTPONLY': True,
+    "JWT_AUTH_HTTPONLY": True,
+    "JWT_AUTH_SAMESITE": "None",
+    "JWT_AUTH_SECURE": True
 }
 
 # Static files (CSS, JavaScript, Images)
