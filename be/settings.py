@@ -83,8 +83,6 @@ REST_FRAMEWORK = {
     )
 }
 
-TIME_ZONE = "Europe/Bratislava"
-
 ROOT_URLCONF = 'be.urls'
 
 TEMPLATES = [
@@ -114,8 +112,7 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:9999",
-    "http://192.168.1.141:9999",
+    "http://localhost:9999"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -159,7 +156,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "Europe/Bratislava"
 
 USE_I18N = True
 
