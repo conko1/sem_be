@@ -63,5 +63,5 @@ class EventTypeList(APIView):
 
     def get(self, request):
         event_types = EventType.objects.all()
-        serializer = EventTypeSerializer(data=event_types, many=True)
+        serializer = EventTypeSerializer(instance=event_types, many=True)
         return Response(serializer.data)
