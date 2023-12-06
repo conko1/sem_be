@@ -44,6 +44,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 INSTALLED_APPS = [
     'user',
+    'event',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
