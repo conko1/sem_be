@@ -13,7 +13,7 @@ class EventList(APIView):
 
     def get(self, request):
         events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(instance=events, many=True)
         return Response(serializer.data)
 
     def post(self, request):
@@ -41,12 +41,12 @@ class EventListDetail(APIView):
 
     def get(self, request, pk):
         event = self.get_object(pk)
-        serializer = EventSerializer(event)
+        serializer = EventSerializer(instance=event)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         event = self.get_object(pk)
-        serializer = EventSerializer(event)
+        serializer = EventSerializer(data=event)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -63,5 +63,5 @@ class EventTypeList(APIView):
 
     def get(self, request):
         event_types = EventType.objects.all()
-        serializer = EventTypeSerializer(event_types, many=True)
+        serializer = EventTypeSerializer(data=event_types, many=True)
         return Response(serializer.data)
